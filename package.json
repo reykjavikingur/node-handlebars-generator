@@ -4,7 +4,7 @@
   "description": "Handlebars template bulk compiler to help generate static sites",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "keywords": [
     "handlebars",
@@ -13,5 +13,14 @@
     "static site generator"
   ],
   "author": "Andrew Strader",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "handlebars": "^4.0.5",
+    "underscore": "^1.8.3",
+    "web-template-file-tree": "^1.1.0"
+  },
+  "devDependencies": {
+    "mocha": "^3.0.2",
+    "should": "^11.1.0"
+  }
 }
