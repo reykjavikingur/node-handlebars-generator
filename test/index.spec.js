@@ -48,7 +48,7 @@ describe('HandlebarsGenerator', function () {
 			var expected = Handlebars.compile(template)(data);
 			should(actual).equal(expected);
 		});
-		
+
 	});
 
 });

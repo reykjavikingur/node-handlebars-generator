@@ -6,6 +6,10 @@
   "scripts": {
     "test": "mocha"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reykjavikingur/node-handlebars-generator.git"
+  },
   "keywords": [
     "handlebars",
     "template",
