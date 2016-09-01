@@ -1,0 +1,17 @@
+{
+  "name": "handlebars-generator",
+  "version": "1.0.0",
+  "description": "Handlebars template bulk compile to help generate static sites",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "handlebars",
+    "template",
+    "html",
+    "static site generator"
+  ],
+  "author": "Andrew Strader",
+  "license": "ISC"
+}
