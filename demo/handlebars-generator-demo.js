@@ -1,5 +1,7 @@
 var HandlebarsGenerator = require('../lib/handlebars-generator');
 
+HandlebarsGenerator.registerAssetDirectory(__dirname + '/assets');
+
 HandlebarsGenerator.registerSourceDirectory(__dirname + '/src', {
 	extension: 'hb',
 	prefix: 'comp'
@@ -18,7 +20,7 @@ HandlebarsGenerator.registerPage('index', 'home', {title: 'Site'});
 HandlebarsGenerator.generatePages(__dirname + '/dist', {
 	extension: 'html'
 }).then(function (r) {
-	console.log('generated pages', r);
+	console.log('generated pages');
 }, function (e) {
 	console.error('unable to generate pages:', e);
 });
