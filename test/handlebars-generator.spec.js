@@ -64,6 +64,15 @@ describe('HandlebarsGenerator', function () {
 			});
 		});
 
+		describe('.registerAssetDirectory', function () {
+			beforeEach(function () {
+				handlebarsGenerator.registerAssetDirectory('misc');
+			});
+			it('should add 1 asset directory', function () {
+				should(handlebarsGenerator.assetDirectories.length).equal(1);
+			});
+		});
+
 	});
 
 });

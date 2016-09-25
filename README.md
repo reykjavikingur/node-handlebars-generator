@@ -53,6 +53,17 @@ then you can include it with the syntax `{{>theme/navigation}}`.
 
 ## API
 
+### registerAssetDirectory(path, options)
+
+* `path` {String} the name of the directory containing static asset files
+* `options` {Object}
+    * `prefix` {String} (optional) a subdirectory to put all directory contents into on output
+
+Registering an asset directory means that every file in that directory
+should be written to the output directory when generating pages.
+The helper `asset` can be used in templates with a relative path
+to generate the appropriate URL according to how each page is registered.
+
 ### registerSourceDirectory(path, options)
 
 * `path` {String} the name of the directory containing templates

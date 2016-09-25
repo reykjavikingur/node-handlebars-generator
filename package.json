@@ -20,6 +20,7 @@
   "license": "ISC",
   "dependencies": {
     "handlebars": "^4.0.5",
+    "ncp": "^2.0.0",
     "promise": "^7.1.1",
     "underscore": "^1.8.3",
     "web-template-file-tree": "^1.1.0"
