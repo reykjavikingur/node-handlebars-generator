@@ -1,5 +1,4 @@
-Welcome to {{title}}. {{>stuff}}
-{{>comp/btn}} | {{>comp/tgl}}
+This is a mere demo.
 --
 Style: {{asset 'main.css'}}
 Script: {{asset 'extra/app.js'}}

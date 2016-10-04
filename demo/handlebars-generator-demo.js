@@ -17,6 +17,8 @@ HandlebarsGenerator.registerSourceDirectory(__dirname + '/pages', {
 
 HandlebarsGenerator.registerPage('index', 'home', {title: 'Site'});
 
+HandlebarsGenerator.registerPage('detail/about', 'about', {});
+
 HandlebarsGenerator.generatePages(__dirname + '/dist', {
 	extension: 'html'
 }).then(function (r) {
