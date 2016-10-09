@@ -20,3 +20,8 @@ DestinationDirectory will use it for output.
 
 The intermediate processing phase will be the main subject under testing.
 
+# PageProcessor
+
+* registerSourceMap(sourceMap)
+* registerPage(outputPath, inputPath, data)
+* generatePageMap()
