@@ -115,6 +115,7 @@ describe('DestinationDirectory', function () {
 
 				it('should pass fileTree to static method', function () {
 					var fileTree = new FileTree('fake-dist', {});
+					fileTree.cache = pageMap;
 					should(DestinationDirectory.save).be.calledWith(fileTree);
 				});
 
