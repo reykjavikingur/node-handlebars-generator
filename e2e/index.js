@@ -4,6 +4,7 @@ var cp = require('child_process');
 var execFileSync = cp.execFileSync;
 
 runTest('basic');
+runTest('tiered');
 
 function runTest(path) {
 	var dir = __dirname + '/' + path;

@@ -169,6 +169,32 @@ describe('PageProcessor', function () {
 				});
 			});
 
+			describe('for top-level page with asset', function () {
+				beforeEach(function () {
+					instance.registerSourceMap({
+						'main': 'Click {{asset "logo.png"}} to continue'
+					});
+					instance.registerPage('main', 'main');
+				});
+				it('should generate page with correct asset path', function () {
+					var pageMap = instance.generatePageMap();
+					should(pageMap['main']).eql('Click logo.png to continue');
+				});
+			});
+
+			describe('for next-level page with asset', function(){
+				beforeEach(function () {
+					instance.registerSourceMap({
+						'promo': 'Click {{asset "logo.png"}} to continue'
+					});
+					instance.registerPage('zone/cta', 'promo');
+				});
+				it('should generate page with correct asset path', function () {
+					var pageMap = instance.generatePageMap();
+					should(pageMap['zone/cta']).eql('Click ../logo.png to continue');
+				});
+			});
+
 		});
 	});
 
