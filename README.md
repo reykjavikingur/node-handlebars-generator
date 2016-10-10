@@ -39,6 +39,10 @@ registering partials for all files in `lib` with the extension `.hb`.
 The `handlebars-generator` module is a singleton that uses the default `handlebars` instance.
 So any helpers that you register with `handlebars` can be used in templates that `handlebars-generator` compiles.
 
+The helper `asset` is defined when pages are generated
+to generate the appropriate URL with a relative path
+according to how each page is registered.
+
 ## Partials
 
 The `handlebars-generator` module registers partials according to the relative paths to templates
@@ -52,17 +56,6 @@ In other words, if your source directory contains a file at the path `theme/navi
 then you can include it with the syntax `{{>theme/navigation}}`.
 
 ## API
-
-### registerAssetDirectory(path, options)
-
-* `path` {String} the name of the directory containing static asset files
-* `options` {Object}
-    * `prefix` {String} (optional) a subdirectory to put all directory contents into on output
-
-Registering an asset directory means that every file in that directory
-should be written to the output directory when generating pages.
-The helper `asset` can be used in templates with a relative path
-to generate the appropriate URL according to how each page is registered.
 
 ### registerSourceDirectory(path, options)
 
