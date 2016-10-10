@@ -1,8 +1,10 @@
 var should = require('should');
 var sinon = require('sinon');
+require('should-sinon');
 var HandlebarsGenerator = require('../lib/handlebars-generator');
 var Handlebars = require('handlebars');
-var FileTree = require('web-template-file-tree');
+var SourceDirectory = require('../lib/source-directory');
+var Promise = require('promise');
 
 describe('HandlebarsGenerator', function () {
 
@@ -42,26 +44,139 @@ describe('HandlebarsGenerator', function () {
 			should(handlebarsGenerator).be.ok();
 		});
 
-		it('should initially have 0 pages', function () {
-			should(handlebarsGenerator.pages).eql([]);
-		});
-
 		describe('.registerPage', function () {
 			beforeEach(function () {
-				handlebarsGenerator.registerPage('index', 'home', {title: 'Welcome'});
+				sinon.spy(handlebarsGenerator.pageProcessor, 'registerPage');
 			});
-			it('should add 1 page', function () {
-				should(handlebarsGenerator.pages.length).equal(1);
+			afterEach(function () {
+				handlebarsGenerator.pageProcessor.registerPage.restore();
+			});
+			it('should register page with page processor', function () {
+				handlebarsGenerator.registerPage('index', 'home', {title: 'Welcome'});
+				should(handlebarsGenerator.pageProcessor.registerPage).be.calledWith('index', 'home', {title: 'Welcome'});
 			});
 		});
 
 		describe('.registerSourceDirectory', function () {
 			beforeEach(function () {
-				handlebarsGenerator.registerSourceDirectory('src');
+				sinon.stub(SourceDirectory, 'create', function () {
+					return {
+						load: function () {
+							return Promise.resolve({
+								foo: 'abc'
+							});
+						}
+					};
+				});
 			});
-			it('should add 1 source directory', function () {
-				should(handlebarsGenerator.sourceDirectories.length).equal(1);
+			afterEach(function () {
+				SourceDirectory.create.restore();
 			});
+			describe('invocation', function () {
+				beforeEach(function (done) {
+					sinon.stub(handlebarsGenerator.pageProcessor, 'registerSourceMap');
+					handlebarsGenerator.registerSourceDirectory('src');
+					setTimeout(done);
+				});
+				afterEach(function () {
+					handlebarsGenerator.pageProcessor.registerSourceMap.restore();
+				});
+				it('should create source directory', function () {
+					should(SourceDirectory.create).be.calledWith('src');
+				});
+				it('should register source map with page processor', function () {
+					should(handlebarsGenerator.pageProcessor.registerSourceMap).be.calledWith({
+						foo: 'abc'
+					});
+				});
+				it('should add one source promise', function () {
+					should(handlebarsGenerator.sourcePromises.length).eql(1);
+				});
+			});
+
+		});
+
+		describe('.generatePages', function () {
+
+			describe('without any registrations', function () {
+				var promise;
+				beforeEach(function (done) {
+					promise = handlebarsGenerator.generatePages('dist');
+					setTimeout(done);
+				});
+				it('should return something', function () {
+					should(promise).be.ok();
+				});
+				it('should resolve', function (done) {
+					promise.then(function (r) {
+						done();
+					}, function (e) {
+						done(new Error('rejected'));
+					});
+				});
+			});
+
+			describe('with one source directory and one page', function () {
+				beforeEach(function () {
+					sinon.stub(SourceDirectory, 'create', function () {
+						return {
+							load: function () {
+								return Promise.resolve({
+									foo: 'abc'
+								});
+							}
+						};
+					});
+
+					handlebarsGenerator.registerSourceDirectory('src');
+					handlebarsGenerator.registerPage('pfoo', 'foo');
+				});
+				afterEach(function () {
+					SourceDirectory.create.restore();
+				});
+
+				describe('invocation', function () {
+					var promise;
+					beforeEach(function (done) {
+						sinon.spy(handlebarsGenerator.pageProcessor, 'generatePageMap');
+						sinon.spy(handlebarsGenerator.destinationDirectory, 'registerPageMap');
+						sinon.stub(handlebarsGenerator.destinationDirectory, 'save', function () {
+							return Promise.resolve({});
+						});
+						promise = handlebarsGenerator.generatePages('dist');
+						setTimeout(done);
+					});
+					afterEach(function () {
+						handlebarsGenerator.pageProcessor.generatePageMap.restore();
+						handlebarsGenerator.destinationDirectory.registerPageMap.restore();
+						handlebarsGenerator.destinationDirectory.save.restore();
+					});
+					it('should return promise', function () {
+						should(promise).be.ok();
+					});
+					it('should resolve', function (done) {
+						promise.then(function (r) {
+							done();
+						}, function (e) {
+							done(new Error('rejected'));
+						});
+					});
+					it('should call pageProcessor.generatePageMap', function () {
+						should(handlebarsGenerator.pageProcessor.generatePageMap).be.called();
+					});
+					it('should call destinationDirectory.registerPageMap', function () {
+						should(handlebarsGenerator.destinationDirectory.registerPageMap).be.calledWith({
+							pfoo: 'abc'
+						});
+					});
+					it('should call destinationDirectory.save', function () {
+						should(handlebarsGenerator.destinationDirectory.save).be.calledWith('dist', {
+							extension: undefined
+						});
+					});
+				});
+			});
+
 		});
 
 	});
