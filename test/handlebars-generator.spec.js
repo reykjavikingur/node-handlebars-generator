@@ -112,6 +112,22 @@ describe('HandlebarsGenerator', function () {
 			});
 		});
 
+		describe('.registerDataFactory', function () {
+			var dataFactory;
+			beforeEach(function () {
+				dataFactory = function () {
+				};
+				sinon.spy(handlebarsGenerator.pageProcessor, 'registerDataFactory');
+				handlebarsGenerator.registerDataFactory(dataFactory);
+			});
+			afterEach(function () {
+				handlebarsGenerator.pageProcessor.registerDataFactory.restore();
+			});
+			it('should call pageProcessor.registerDataFactory', function () {
+				should(handlebarsGenerator.pageProcessor.registerDataFactory).be.calledWith(dataFactory);
+			});
+		});
+
 		describe('.generatePages', function () {
 
 			describe('without any registrations', function () {
