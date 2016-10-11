@@ -79,6 +79,19 @@ Then, by registering that source directory, you can use the partial inclusion sy
 Registering a page means to designate that a particular template should be rendered with particular data
 to generate a particular file in the eventual output directory.
 
+### registerPageFactory(pageFactory)
+
+* `pageFactory` {Function} given a source path, should give a corresponding page path, if any
+
+You can register pages in bulk by providing a function that maps source paths to page paths,
+that is, indicates what pages should be registered for which of the source paths.
+
+### registerDataFactory(dataFactory)
+
+* `dataFactory` {Function} given a page path, should give an object (if any) to be combined with the data specifically registered to the page (if any)
+
+Data factories allow bulk association of data to pages, in addition to page-specific registrations.
+
 ### generatePages(directory, options, callback)
 
 * `directory` {String} the path to the output directory, where template renderings will be written as files according to the page registrations

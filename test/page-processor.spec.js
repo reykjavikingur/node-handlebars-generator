@@ -89,6 +89,127 @@ describe('PageProcessor', function () {
 
 		});
 
+		describe('.registerPageFactory', function () {
+
+			var instance, pageFactory;
+
+			beforeEach(function () {
+				instance = new PageProcessor();
+				pageFactory = function (sourcePath) {
+					if (sourcePath == 'foo') {
+						return 'pfoo';
+					}
+					else if (sourcePath == 'bar') {
+						return 'pbar';
+					}
+				};
+				instance.registerPageFactory(pageFactory);
+			});
+
+			describe('with neither of the pages sourced', function () {
+				beforeEach(function () {
+					sinon.spy(instance, 'registerPage');
+					instance.generatePageMap();
+				});
+				afterEach(function () {
+					instance.registerPage.restore();
+				});
+				it('should not call registerPage', function () {
+					should(instance.registerPage).not.be.called();
+				});
+			});
+
+			describe('with the first page sourced', function () {
+				beforeEach(function () {
+					sinon.spy(instance, 'registerPage');
+					instance.registerSourceMap({
+						foo: 'abc'
+					});
+					instance.generatePageMap();
+				});
+				afterEach(function () {
+					instance.registerPage.restore();
+				});
+				it('should call registerPage once', function () {
+					should(instance.registerPage).be.calledOnce();
+				});
+				it('should call registerPage with correct arguments', function () {
+					should(instance.registerPage).be.calledWith('pfoo', 'foo');
+				});
+			});
+
+			describe('with the first page sourced and a non-factory page', function () {
+				beforeEach(function () {
+					sinon.spy(instance, 'registerPage');
+					instance.registerSourceMap({
+						foo: 'abc',
+						widg: 'btn'
+					});
+					instance.generatePageMap();
+				});
+				afterEach(function () {
+					instance.registerPage.restore();
+				});
+				it('should call registerPage once', function () {
+					should(instance.registerPage).be.calledOnce();
+				});
+				it('should call registerPage with correct arguments', function () {
+					should(instance.registerPage).be.calledWith('pfoo', 'foo');
+				});
+			});
+
+			describe('with first and second pages sourced', function () {
+				beforeEach(function () {
+					sinon.spy(instance, 'registerPage');
+					instance.registerSourceMap({
+						foo: 'abc',
+						bar: 'xyz'
+					});
+					instance.generatePageMap();
+				});
+				afterEach(function () {
+					instance.registerPage.restore();
+				});
+				it('should call registerPage twice', function () {
+					should(instance.registerPage).be.calledTwice();
+				});
+				it('should call registerPage with correct arguments for the one call', function () {
+					should(instance.registerPage).be.calledWith('pfoo', 'foo');
+				});
+				it('should call registerPage with correct arguments for the other call', function () {
+					should(instance.registerPage).be.calledWith('pbar', 'bar');
+				});
+			});
+
+			describe('twice', function () {
+				beforeEach(function () {
+					instance.registerPageFactory(function (sourcePath) {
+						if (sourcePath == 'baz') {
+							return 'pbaz';
+						}
+					});
+					sinon.spy(instance, 'registerPage');
+					instance.registerSourceMap({
+						bar: 'xyz',
+						baz: 'pqr'
+					});
+					instance.generatePageMap();
+				});
+				afterEach(function () {
+					instance.registerPage.restore();
+				});
+				it('should call registerPage twice', function () {
+					should(instance.registerPage).be.calledTwice();
+				});
+				it('should call registerPage with arguments for the one call', function () {
+					should(instance.registerPage).be.calledWith('pbaz', 'baz');
+				});
+				it('should call registerPage with arguments for the other call', function () {
+					should(instance.registerPage).be.calledWith('pbar', 'bar');
+				});
+			});
+		});
+
 		describe('.generatePageMap', function () {
 
 			it('should initialize return empty object', function () {
@@ -182,7 +303,7 @@ describe('PageProcessor', function () {
 				});
 			});
 
-			describe('for next-level page with asset', function(){
+			describe('for next-level page with asset', function () {
 				beforeEach(function () {
 					instance.registerSourceMap({
 						'promo': 'Click {{asset "logo.png"}} to continue'
