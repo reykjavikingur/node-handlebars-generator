@@ -57,6 +57,30 @@ then you can include it with the syntax `{{>theme/navigation}}`.
 
 ## API
 
+### generateSite(sourcePath, distPath, [options], [callback])
+
+* `sourcePath` {String} the path of the directory containing templates
+* `distPath` {String} the path of the output directory, where page templates will be rendered as files
+* `options` {Object} (optional)
+    * `sourceExtension` {String} (default: "html") the file extension for templates (source files)
+    * `distExtension` {String} (default: "html") the file extension for pages (output files)
+* `callback` {Function} (optional) the asynchronous callback function (returns promise if not given)
+
+Generating a site means rendering page templates in a source directory and writing page output to files in a destination directory:
+
+* Put template files in the source directory.
+* Every template will be registered as a partial.
+* Make a template be registered as a page template by creating a corresponding ".js" file.
+    * For example, suppose your source directory is "./src", and a file exists in the path "./src/faq.html":
+    * Create "./src/faq.js" that exports data (an Object).
+    * The existence of the "js" file will the template to be registered as a page and rendered with the data that it exports.
+* Every page template in the source directory will be written to the same relative path in the destination directory.
+* Global data (available to every page) is whatever is exported by "./src/index.js" (assuming "./src" is your source path)
+* Global data also includes a variable called "pagePath" whose value is the relative path of the current page template being rendered.
+
+
+## Lower-Level API
+
 ### registerSourceDirectory(path, options)
 
 * `path` {String} the name of the directory containing templates

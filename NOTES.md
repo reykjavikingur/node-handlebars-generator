@@ -1,3 +1,11 @@
+2016-11-02
+
+The previous refactoring constituted version 3.0.
+Now it's clear that this module can be even simpler and easier to use
+by using a convention that I will encapsulate in a new method:
+
+* generateSite(sourceDirectory, destinationDirectory, [options], [callback]) => Promise
+
 2016-10-09
 
 Refactoring to separate processing into three distinct phases:

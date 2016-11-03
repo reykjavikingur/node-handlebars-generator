@@ -1,6 +1,6 @@
 {
   "name": "handlebars-generator",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Handlebars template bulk compiler to help generate static sites",
   "main": "index.js",
   "scripts": {
