@@ -6,33 +6,47 @@ This is a tool for developing modular static site generators that use Handlebars
 
 Add as a dependency to your Node package and create a script that does the following:
 
-* register directories containing page templates or partial templates
-* register pages in terms of path, template, and data
-* specify destination directory where files will be generated from registered page template rendering output
+* read Handlebars templates in a source directory
+* generate data by executing scripts in the source directory
+* render the templates with the respective data
+* include partials referenced by paths relative to the source directory
+* write document files to a destination directory
+
 
 ## Example
 
 ```
 var HandlebarsGenerator = require('handlebars-generator');
 
-HandlebarsGenerator.registerSourceDirectory(__dirname + '/lib', {
-    prefix: 'part',
-    extension: 'hb'
-});
-
-HandlebarsGenerator.registerSourceDirectory(__dirname + '/src');
-
-HandlebarsGenerator.registerPage('index', 'home', { title: 'Welcome' });
-
-HandlebarsGenerator.generatePages(__dirname + '/dist', {
-	extension: 'html'
-}, function(err) {
-	if (err) console.error(err.message);
-});
+HandlebarsGenerator.generateSite('src', 'dist')
+	.then(function () {
+		console.log('successfully generated pages');
+	}, function (e) {
+		console.error('failed to generate pages', e);
+	})
+;
 ```
 
-This example Node script would read `src/home.html`, render it with the given data, and write `dist/index.html`,
-registering partials for all files in `lib` with the extension `.hb`.
+This example Node script would:
+ 
+* read every file in `src` with an extension ".html"
+* register each as a partial template (which can be included by other templates)
+* register a page template for each case where there is a corresponding ".js" file
+* render each page template with the data exported by the ".js" file
+* write a corresponding file in `dist`
+
+Suppose the "src" directory contains the following files: component.html, index.html, index.js, faq.html, faq.js
+
+Then the code above would generate a "dist" directory with the following files: index.html, faq.html
+
+The file "dist/index.html" would have been generated from the template "src/index.html" with the data exported by "src/index.js".
+
+The file "dist/faq.html" would have been generated from the template "src/faq.html" with the data exported by "src/index.js" and "src/faq.js".
+
+NOTE: The "index.js" file in the source directory is considered site-wide data that every page template has access to but individual page data scripts can override.
+
+The file "src/component.html" would not be compiled to any file in "dist" because it has no corresponding script file. However, any template can reference the partial `{{>component}}`.
+
 
 ## Helpers
 
@@ -124,3 +138,24 @@ Data factories allow bulk association of data to pages, in addition to page-spec
 * `callback` {Function} the asynchronous callback function (Optional; returns promise if no callback is passed in)
 
 Generating pages produces the files in the output directory based on the registered pages.
+
+### Example
+
+```
+var HandlebarsGenerator = require('handlebars-generator');
+
+HandlebarsGenerator.registerSourceDirectory(__dirname + '/lib', {
+    prefix: 'part',
+    extension: 'hb'
+});
+
+HandlebarsGenerator.registerSourceDirectory(__dirname + '/src');
+
+HandlebarsGenerator.registerPage('index', 'home', { title: 'Welcome' });
+
+HandlebarsGenerator.generatePages(__dirname + '/dist', {
+	extension: 'html'
+}, function(err) {
+	if (err) console.error(err.message);
+});
+```

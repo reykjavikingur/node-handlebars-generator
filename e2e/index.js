@@ -6,6 +6,7 @@ var execFileSync = cp.execFileSync;
 runTest('basic');
 runTest('tiered');
 runTest('factoried');
+runTest('site');
 
 function runTest(path) {
 	var dir = __dirname + '/' + path;
