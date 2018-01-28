@@ -7,6 +7,7 @@ runTest('basic');
 runTest('tiered');
 runTest('factoried');
 runTest('site');
+runTest('fresh');
 
 function runTest(path) {
 	var dir = __dirname + '/' + path;
