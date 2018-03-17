@@ -1,6 +1,7 @@
 const should = require('should');
 const Tracer = require('../lib/tracer');
 const PageProcessor = require('../lib/page-processor');
+const Handlebars = require('handlebars');
 
 describe.only('Tracer', () => {
 
@@ -8,6 +9,7 @@ describe.only('Tracer', () => {
 	beforeEach(() => {
 		tracer = new Tracer();
 		pageProcessor = new PageProcessor();
+		Handlebars.registerHelper('annotate', tracer.helpers.annotate);
 	});
 
 	it('should instantiate', () => {
@@ -16,6 +18,14 @@ describe.only('Tracer', () => {
 
 	it('should initialize 0 traces', () => {
 		should(tracer.traces).eql([]);
+	});
+
+	describe('annotate helper', () => {
+		it('should work properly', () => {
+			var template = '{{#annotate name="index"}}<div>content</div>{{/annotate}}';
+			var output = Handlebars.compile(template)({});
+			should(output).match(/<!-- BEGIN (\d+) index --><div>content<\/div><!-- END \1 index -->/);
+		});
 	});
 
 	describe('given simple source map', () => {
@@ -259,7 +269,7 @@ describe.only('Tracer', () => {
 		});
 	});
 
-	describe.skip('source map with recursion', () => {
+	describe('source map with recursion', () => {
 		beforeEach(() => {
 			var sourceMap = {
 				'list': '{{#each this}}{{#if this.items}}({{>list this.items}}){{else}}:{{this}}{{/if}}{{/each}}',
@@ -289,7 +299,6 @@ describe.only('Tracer', () => {
 				should(trace).be.ok();
 			});
 			it('should have correct output', () => {
-				console.log('recursive index trace.output', trace.output);
 				should(deannotate(trace.output)).eql('start :foo:bar(:baz:quux):corge over');
 			});
 		});
@@ -301,12 +310,12 @@ describe.only('Tracer', () => {
 			it('should have length 2', () => {
 				should(traces.length).eql(2);
 			});
-			describe('the first list trace',()=>{
+			describe('the first list trace', () => {
 				var trace;
-				beforeEach(()=>{
+				beforeEach(() => {
 					trace = traces[0];
 				});
-				it('should have correct output',()=>{
+				it('should have correct output', () => {
 					should(deannotate(trace.output)).eql(':foo:bar(:baz:quux):corge');
 				});
 			});
