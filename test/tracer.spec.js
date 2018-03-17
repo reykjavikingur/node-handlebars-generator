@@ -319,6 +319,15 @@ describe.only('Tracer', () => {
 					should(deannotate(trace.output)).eql(':foo:bar(:baz:quux):corge');
 				});
 			});
+			describe('the second list trace',()=>{
+				var trace;
+				beforeEach(()=>{
+					trace = traces[1];
+				});
+				it('should have correct output',()=>{
+					should(deannotate(trace.output)).eql(':baz:quux');
+				});
+			});
 		});
 	});
 
