@@ -9,7 +9,7 @@ describe.only('Tracer', () => {
 	beforeEach(() => {
 		tracer = new Tracer();
 		pageProcessor = new PageProcessor();
-		Handlebars.registerHelper('annotate', tracer.helpers.annotate);
+		tracer.registerHelpers(Handlebars);
 	});
 
 	it('should instantiate', () => {
