@@ -46,6 +46,9 @@ describe.only('Tracer', () => {
 			it('should have correct output', () => {
 				should(trace.output).eql('Hello');
 			});
+			it('should have no parent', () => {
+				should(trace.parent).not.be.ok();
+			});
 		});
 
 	});
@@ -78,6 +81,9 @@ describe.only('Tracer', () => {
 			it('should have correct output', () => {
 				should(deannotate(trace.output)).eql('Welcome to the place.');
 			});
+			it('should have no parent', () => {
+				should(trace.parent).not.be.ok();
+			});
 		});
 
 		describe('the widget trace', () => {
@@ -91,11 +97,14 @@ describe.only('Tracer', () => {
 			it('should have correct output', () => {
 				should(trace.output).eql('the place');
 			});
+			it('should have correct parent', () => {
+				should(trace.parent).eql('index');
+			});
 		});
 
 	});
 
-	describe('given source map with page including two partials', () => {
+	describe('given source map with page including two different partials', () => {
 		beforeEach(() => {
 			var sourceMap = {
 				'index': 'List: (1) {{>foo}} (2) {{>bar}} (+)',
@@ -122,6 +131,9 @@ describe.only('Tracer', () => {
 			it('should have correct output', () => {
 				should(deannotate(trace.output)).eql('List: (1) First (2) Second (+)');
 			});
+			it('should have no parent', () => {
+				should(trace.parent).not.be.ok();
+			});
 		});
 		describe('the foo trace', () => {
 			var trace;
@@ -134,6 +146,9 @@ describe.only('Tracer', () => {
 			it('should have correct output', () => {
 				should(trace.output).eql('First');
 			});
+			it('should have correct parent', () => {
+				should(trace.parent).eql('index');
+			});
 		});
 		describe('the bar trace', () => {
 			var trace;
@@ -145,6 +160,155 @@ describe.only('Tracer', () => {
 			});
 			it('should have correct output', () => {
 				should(trace.output).eql('Second');
+			});
+			it('should have correct parent', () => {
+				should(trace.parent).eql('index');
+			});
+		});
+	});
+
+	describe('given source map with page including two of same partial', () => {
+		beforeEach(() => {
+			var sourceMap = {
+				'index': 'Example {{>widget}}, {{>widget}}',
+				'widget': 'Blank',
+			};
+			tracer.annotateSourceMap(sourceMap);
+			pageProcessor.registerSourceMap(sourceMap);
+			pageProcessor.registerPage('index', 'index', {});
+			var pageMap = pageProcessor.generatePageMap();
+			tracer.analyzePageMap(pageMap);
+		});
+		it('should have 3 traces', () => {
+			should(tracer.traces.length).eql(3);
+		});
+		describe('the index trace', () => {
+			var trace;
+			beforeEach(() => {
+				trace = tracer.traces.find(trace => trace.name === 'index');
+			});
+			it('should exist', () => {
+				should(trace).be.ok();
+			});
+			it('should have correct output', () => {
+				should(deannotate(trace.output)).eql('Example Blank, Blank');
+			});
+			it('should have no parent', () => {
+				should(trace.parent).not.be.ok();
+			});
+		});
+		describe('the widget traces', () => {
+			var traces;
+			beforeEach(() => {
+				traces = tracer.traces.filter(trace => trace.name === 'widget');
+			});
+			it('should have length 2', () => {
+				should(traces.length).eql(2);
+			});
+		});
+	});
+
+	describe('given source map with page including two of same partial with dynamic differences', () => {
+		beforeEach(() => {
+			var sourceMap = {
+				'index': 'Example {{>widget 101}}, {{>widget 201}}',
+				'widget': 'Number {{this}}',
+			};
+			tracer.annotateSourceMap(sourceMap);
+			pageProcessor.registerSourceMap(sourceMap);
+			pageProcessor.registerPage('index', 'index', {});
+			var pageMap = pageProcessor.generatePageMap();
+			tracer.analyzePageMap(pageMap);
+		});
+		it('should have 3 traces', () => {
+			should(tracer.traces.length).eql(3);
+		});
+		describe('the index trace', () => {
+			var trace;
+			beforeEach(() => {
+				trace = tracer.traces.find(trace => trace.name === 'index');
+			});
+			it('should exist', () => {
+				should(trace).be.ok();
+			});
+			it('should have correct output', () => {
+				should(deannotate(trace.output)).eql('Example Number 101, Number 201');
+			});
+		});
+		describe('the widget traces', () => {
+			var traces;
+			beforeEach(() => {
+				traces = tracer.traces.filter(trace => trace.name === 'widget');
+			});
+			it('should have length 2', () => {
+				should(traces.length).eql(2);
+			});
+			it('should have correct first output', () => {
+				should(traces[0].output).eql('Number 101');
+			});
+			it('should have correct second output', () => {
+				should(traces[1].output).eql('Number 201');
+			});
+			it('should have correct first parent', () => {
+				should(traces[0].parent).eql('index');
+			});
+			it('should have correct second parent', () => {
+				should(traces[1].parent).eql('index');
+			});
+
+		});
+	});
+
+	describe.skip('source map with recursion', () => {
+		beforeEach(() => {
+			var sourceMap = {
+				'list': '{{#each this}}{{#if this.items}}({{>list this.items}}){{else}}:{{this}}{{/if}}{{/each}}',
+				'index': 'start {{>list stuff}} over',
+			};
+			tracer.annotateSourceMap(sourceMap);
+			pageProcessor.registerSourceMap(sourceMap);
+			pageProcessor.registerPage('index', 'index', {
+				stuff: [
+					'foo',
+					'bar',
+					{
+						items: ['baz', 'quux']
+					},
+					'corge'
+				]
+			});
+			var pageMap = pageProcessor.generatePageMap();
+			tracer.analyzePageMap(pageMap);
+		});
+		describe('the index trace', () => {
+			var trace;
+			beforeEach(() => {
+				trace = tracer.traces.find(trace => trace.name === 'index');
+			});
+			it('should exist', () => {
+				should(trace).be.ok();
+			});
+			it('should have correct output', () => {
+				console.log('recursive index trace.output', trace.output);
+				should(deannotate(trace.output)).eql('start :foo:bar(:baz:quux):corge over');
+			});
+		});
+		describe('the list traces', () => {
+			var traces;
+			beforeEach(() => {
+				traces = tracer.traces.filter(trace => trace.name === 'list');
+			});
+			it('should have length 2', () => {
+				should(traces.length).eql(2);
+			});
+			describe('the first list trace',()=>{
+				var trace;
+				beforeEach(()=>{
+					trace = traces[0];
+				});
+				it('should have correct output',()=>{
+					should(deannotate(trace.output)).eql(':foo:bar(:baz:quux):corge');
+				});
 			});
 		});
 	});
