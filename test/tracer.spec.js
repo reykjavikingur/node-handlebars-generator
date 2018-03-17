@@ -24,7 +24,7 @@ describe.only('Tracer', () => {
 		it('should work properly', () => {
 			var template = '{{#annotate name="index"}}<div>content</div>{{/annotate}}';
 			var output = Handlebars.compile(template)({});
-			should(output).match(/<!-- BEGIN (\d+) index --><div>content<\/div><!-- END \1 index -->/);
+			should(output).match(/<!-- BEGIN (\d+) (\d+) index --><div>content<\/div><!-- END \1 \2 index -->/);
 		});
 	});
 
@@ -135,6 +135,57 @@ describe.only('Tracer', () => {
 			var trace;
 			beforeEach(() => {
 				trace = tracer.traces.find(trace => trace.name === 'widget');
+			});
+			it('should exist', () => {
+				should(trace).be.ok();
+			});
+			it('should have correct output', () => {
+				should(trace.output).eql('the place');
+			});
+			it('should have correct parent', () => {
+				should(trace.parent).eql('index');
+			});
+		});
+
+	});
+
+	describe('given source map with one inclusion having complex name', () => {
+		beforeEach(() => {
+			var sourceMap = {
+				'index': 'Welcome to {{>par_dir/spec-widget}}.',
+				'par_dir/spec-widget': 'the place',
+			};
+			tracer.annotateSourceMap(sourceMap);
+			pageProcessor.registerSourceMap(sourceMap);
+			pageProcessor.registerPage('index', 'index', {});
+			var pageMap = pageProcessor.generatePageMap();
+			tracer.analyzePageMap(pageMap);
+		});
+
+		it('should have 2 traces', () => {
+			should(tracer.traces.length).eql(2);
+		});
+
+		describe('the index trace', () => {
+			var trace;
+			beforeEach(() => {
+				trace = tracer.traces.find(trace => trace.name === 'index');
+			});
+			it('should exist', () => {
+				should(trace).be.ok();
+			});
+			it('should have correct output', () => {
+				should(deannotate(trace.output)).eql('Welcome to the place.');
+			});
+			it('should have no parent', () => {
+				should(trace.parent).not.be.ok();
+			});
+		});
+
+		describe('the widget trace', () => {
+			var trace;
+			beforeEach(() => {
+				trace = tracer.traces.find(trace => trace.name === 'par_dir/spec-widget');
 			});
 			it('should exist', () => {
 				should(trace).be.ok();
