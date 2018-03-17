@@ -3,7 +3,7 @@ const Tracer = require('../lib/tracer');
 const PageProcessor = require('../lib/page-processor');
 const Handlebars = require('handlebars');
 
-describe.only('Tracer', () => {
+describe('Tracer', () => {
 
 	var tracer, pageProcessor;
 	beforeEach(() => {
@@ -412,7 +412,7 @@ describe.only('Tracer', () => {
 			it('should have correct output', () => {
 				should(trace.output).eql('Logo');
 			});
-			it.skip('should have correct parent', () => {
+			it('should have correct parent', () => {
 				should(trace.parent).eql('header');
 			});
 		});
@@ -482,7 +482,7 @@ describe.only('Tracer', () => {
 				it('should have correct output', () => {
 					should(deannotate(trace.output)).eql(':baz:quux');
 				});
-				it.skip('should have correct parent', () => {
+				it('should have correct parent', () => {
 					should(trace.parent).eql('list');
 				});
 			});
