@@ -63,6 +63,41 @@ describe.only('Tracer', () => {
 
 	});
 
+	describe('given simple source map with line break', () => {
+		beforeEach(() => {
+			var sourceMap, pageMap;
+			sourceMap = {
+				'index': 'Hello\nworld.',
+			};
+			tracer.annotateSourceMap(sourceMap);
+			pageProcessor.registerSourceMap(sourceMap);
+			pageProcessor.registerPage('index', 'index', {});
+			pageMap = pageProcessor.generatePageMap();
+			tracer.analyzePageMap(pageMap);
+		});
+
+		it('should have 1 trace', () => {
+			should(tracer.traces.length).eql(1);
+		});
+
+		describe('the trace', () => {
+			var trace;
+			beforeEach(() => {
+				trace = tracer.traces[0];
+			});
+			it('should have correct name', () => {
+				should(trace.name).eql('index');
+			});
+			it('should have correct output', () => {
+				should(trace.output).eql('Hello\nworld.');
+			});
+			it('should have no parent', () => {
+				should(trace.parent).not.be.ok();
+			});
+		});
+
+	});
+
 	describe('given source map with one inclusion', () => {
 		beforeEach(() => {
 			var sourceMap = {
