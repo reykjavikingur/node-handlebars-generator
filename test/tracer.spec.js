@@ -355,6 +355,69 @@ describe.only('Tracer', () => {
 		});
 	});
 
+	describe('given source map with more than one inclusion level', () => {
+		beforeEach(() => {
+			var sourceMap = {
+				'index': 'Site {{>header}} (c)',
+				'header': 'Head {{>logo}} Er',
+				'logo': 'Logo',
+			};
+			tracer.annotateSourceMap(sourceMap);
+			pageProcessor.registerSourceMap(sourceMap);
+			pageProcessor.registerPage('index', 'index', {});
+			var pageMap = pageProcessor.generatePageMap();
+			tracer.analyzePageMap(pageMap);
+		});
+		it('should have 3 traces', () => {
+			should(tracer.traces.length).eql(3);
+		});
+		describe('the index trace', () => {
+			var trace;
+			beforeEach(() => {
+				trace = tracer.traces.find(trace => trace.name === 'index');
+			});
+			it('should exist', () => {
+				should(trace).be.ok();
+			});
+			it('should have correct output', () => {
+				should(deannotate(trace.output)).eql('Site Head Logo Er (c)');
+			});
+			it('should not have parent', () => {
+				should(trace.parent).not.be.ok();
+			});
+		});
+		describe('the header trace', () => {
+			var trace;
+			beforeEach(() => {
+				trace = tracer.traces.find(trace => trace.name === 'header');
+			});
+			it('should exist', () => {
+				should(trace).be.ok();
+			});
+			it('should have correct output', () => {
+				should(deannotate(trace.output)).eql('Head Logo Er');
+			});
+			it('should have correct parent', () => {
+				should(trace.parent).eql('index');
+			});
+		});
+		describe('the logo trace', () => {
+			var trace;
+			beforeEach(() => {
+				trace = tracer.traces.find(trace => trace.name === 'logo');
+			});
+			it('should exist', () => {
+				should(trace).be.ok();
+			});
+			it('should have correct output', () => {
+				should(trace.output).eql('Logo');
+			});
+			it.skip('should have correct parent', () => {
+				should(trace.parent).eql('header');
+			});
+		});
+	});
+
 	describe('source map with recursion', () => {
 		beforeEach(() => {
 			var sourceMap = {
@@ -387,6 +450,9 @@ describe.only('Tracer', () => {
 			it('should have correct output', () => {
 				should(deannotate(trace.output)).eql('start :foo:bar(:baz:quux):corge over');
 			});
+			it('should not have parent', () => {
+				should(trace.parent).not.be.ok();
+			});
 		});
 		describe('the list traces', () => {
 			var traces;
@@ -404,14 +470,20 @@ describe.only('Tracer', () => {
 				it('should have correct output', () => {
 					should(deannotate(trace.output)).eql(':foo:bar(:baz:quux):corge');
 				});
+				it('should have correct parent', () => {
+					should(trace.parent).eql('index');
+				});
 			});
-			describe('the second list trace',()=>{
+			describe('the second list trace', () => {
 				var trace;
-				beforeEach(()=>{
+				beforeEach(() => {
 					trace = traces[1];
 				});
-				it('should have correct output',()=>{
+				it('should have correct output', () => {
 					should(deannotate(trace.output)).eql(':baz:quux');
+				});
+				it.skip('should have correct parent', () => {
+					should(trace.parent).eql('list');
 				});
 			});
 		});
