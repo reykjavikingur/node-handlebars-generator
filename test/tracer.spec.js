@@ -492,5 +492,6 @@ describe('Tracer', () => {
 });
 
 function deannotate(output) {
+	return output;
 	return String(output).replace(/<!--.*?-->/g, '');
 }
