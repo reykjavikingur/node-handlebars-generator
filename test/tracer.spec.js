@@ -124,7 +124,7 @@ describe('Tracer', () => {
 				should(trace).be.ok();
 			});
 			it('should have correct output', () => {
-				should(deannotate(trace.output)).eql('Welcome to the place.');
+				should(trace.output).eql('Welcome to the place.');
 			});
 			it('should have no parent', () => {
 				should(trace.parent).not.be.ok();
@@ -175,7 +175,7 @@ describe('Tracer', () => {
 				should(trace).be.ok();
 			});
 			it('should have correct output', () => {
-				should(deannotate(trace.output)).eql('Welcome to the place.');
+				should(trace.output).eql('Welcome to the place.');
 			});
 			it('should have no parent', () => {
 				should(trace.parent).not.be.ok();
@@ -225,7 +225,7 @@ describe('Tracer', () => {
 				should(trace).be.ok();
 			});
 			it('should have correct output', () => {
-				should(deannotate(trace.output)).eql('List: (1) First (2) Second (+)');
+				should(trace.output).eql('List: (1) First (2) Second (+)');
 			});
 			it('should have no parent', () => {
 				should(trace.parent).not.be.ok();
@@ -287,7 +287,7 @@ describe('Tracer', () => {
 				should(trace).be.ok();
 			});
 			it('should have correct output', () => {
-				should(deannotate(trace.output)).eql('Example Blank, Blank');
+				should(trace.output).eql('Example Blank, Blank');
 			});
 			it('should have no parent', () => {
 				should(trace.parent).not.be.ok();
@@ -328,7 +328,7 @@ describe('Tracer', () => {
 				should(trace).be.ok();
 			});
 			it('should have correct output', () => {
-				should(deannotate(trace.output)).eql('Example Number 101, Number 201');
+				should(trace.output).eql('Example Number 101, Number 201');
 			});
 		});
 		describe('the widget traces', () => {
@@ -380,7 +380,7 @@ describe('Tracer', () => {
 				should(trace).be.ok();
 			});
 			it('should have correct output', () => {
-				should(deannotate(trace.output)).eql('Site Head Logo Er (c)');
+				should(trace.output).eql('Site Head Logo Er (c)');
 			});
 			it('should not have parent', () => {
 				should(trace.parent).not.be.ok();
@@ -395,7 +395,7 @@ describe('Tracer', () => {
 				should(trace).be.ok();
 			});
 			it('should have correct output', () => {
-				should(deannotate(trace.output)).eql('Head Logo Er');
+				should(trace.output).eql('Head Logo Er');
 			});
 			it('should have correct parent', () => {
 				should(trace.parent).eql('index');
@@ -448,7 +448,7 @@ describe('Tracer', () => {
 				should(trace).be.ok();
 			});
 			it('should have correct output', () => {
-				should(deannotate(trace.output)).eql('start :foo:bar(:baz:quux):corge over');
+				should(trace.output).eql('start :foo:bar(:baz:quux):corge over');
 			});
 			it('should not have parent', () => {
 				should(trace.parent).not.be.ok();
@@ -468,7 +468,7 @@ describe('Tracer', () => {
 					trace = traces[0];
 				});
 				it('should have correct output', () => {
-					should(deannotate(trace.output)).eql(':foo:bar(:baz:quux):corge');
+					should(trace.output).eql(':foo:bar(:baz:quux):corge');
 				});
 				it('should have correct parent', () => {
 					should(trace.parent).eql('index');
@@ -480,7 +480,7 @@ describe('Tracer', () => {
 					trace = traces[1];
 				});
 				it('should have correct output', () => {
-					should(deannotate(trace.output)).eql(':baz:quux');
+					should(trace.output).eql(':baz:quux');
 				});
 				it('should have correct parent', () => {
 					should(trace.parent).eql('list');
@@ -490,8 +490,3 @@ describe('Tracer', () => {
 	});
 
 });
-
-function deannotate(output) {
-	return output;
-	return String(output).replace(/<!--.*?-->/g, '');
-}
