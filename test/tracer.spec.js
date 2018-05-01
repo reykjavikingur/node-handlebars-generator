@@ -99,20 +99,25 @@ describe('Tracer', () => {
 	});
 
 	describe('given source map with one inclusion', () => {
+		var sourceMap, pageMap;
 		beforeEach(() => {
-			var sourceMap = {
+			sourceMap = {
 				'index': 'Welcome to {{>widget}}.',
 				'widget': 'the place',
 			};
 			tracer.annotateSourceMap(sourceMap);
 			pageProcessor.registerSourceMap(sourceMap);
 			pageProcessor.registerPage('index', 'index', {});
-			var pageMap = pageProcessor.generatePageMap();
+			pageMap = pageProcessor.generatePageMap();
 			tracer.analyzePageMap(pageMap);
 		});
 
 		it('should have 2 traces', () => {
 			should(tracer.traces.length).eql(2);
+		});
+
+		it('should remove annotations from page map', () => {
+			should(pageMap.index).eql('Welcome to the place.');
 		});
 
 		describe('the index trace', () => {
