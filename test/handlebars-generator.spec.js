@@ -211,26 +211,6 @@ describe('HandlebarsGenerator', function () {
 
         });
 
-        describe('.generateSite', function () {
-            describe('call with non-default options', function () {
-                beforeEach(function () {
-                    sinon.spy(handlebarsGenerator, 'registerSourceDirectory');
-                    sinon.spy(handlebarsGenerator, 'generatePages');
-                    var options = {sourceExtension: 'hbs', distExtension: 'php'};
-                    handlebarsGenerator.generateSite('source', 'dist', options);
-                });
-                afterEach(function () {
-                    handlebarsGenerator.sourcePromises = [];
-                });
-                it('should set source extension to hbs', function () {
-                    should(handlebarsGenerator.registerSourceDirectory).be.calledWith('source', {extension: 'hbs'});
-                });
-                it('should set dist extension to php', function () {
-                    should(handlebarsGenerator.generatePages).be.calledWith('dist', {extension: 'php'});
-                });
-            });
-        });
-
     });
 
 });
