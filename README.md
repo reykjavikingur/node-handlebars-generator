@@ -15,7 +15,7 @@ Add as a dependency to your Node package and create a script that does the follo
 
 ## Example
 
-```
+```javascript
 var HandlebarsGenerator = require('handlebars-generator');
 
 HandlebarsGenerator.generateSite('src', 'dist')
@@ -141,7 +141,7 @@ Generating pages produces the files in the output directory based on the registe
 
 ### Example
 
-```
+```javascript
 var HandlebarsGenerator = require('handlebars-generator');
 
 HandlebarsGenerator.registerSourceDirectory(__dirname + '/lib', {
